@@ -10,10 +10,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.MediaController.MediaPlayerControl;
 
@@ -31,6 +33,14 @@ import java.util.Comparator;
  */
 
 public class MainActivity extends Activity implements MediaPlayerControl {
+    public static final String LOG_TAG = "MainActivity";
+
+    private RobotService mService;
+    private Vibrator mVibrator;
+    private boolean mIsServiceBound = false;
+    private Button mPowerButton;
+    private Preferences mPreferences;
+
 
 	//song list variables
 	private ArrayList<com.example.android.musicplayertapz.Song> songList;
@@ -52,6 +62,11 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+        Counter timer = new Counter();
+        Thread thread = new Thread(timer);
+        doStartService();
+        doBindService();
+
 
 		//retrieve list view
 		songView = (ListView)findViewById(R.id.song_list);
@@ -294,19 +309,35 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 		super.onDestroy();
 	}
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.i(LOG_TAG, "Service connected");
+            mService = ((RobotService.RobotBinder)service).getService();
+            mService.start();
+            mPowerButton.setSelected(mService.isStarted());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+            Log.i(LOG_TAG, "Service disconnected");
+        }
+    };
+
 	/***
 	 * Binds service if it's not bound already
 	 */
 	private void doBindService() {
 		if (!mIsServiceBound) {
 			Log.i(LOG_TAG, "doBindService");
-			bindService(new Intent(MainActivity.this, com.tartakynov.robotnoise.RobotService.class), mConnection, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
+			bindService(new Intent(MainActivity.this, com.example.android.musicplayertapz.RobotService.class), mConnection, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
 			mIsServiceBound = true;
 		}
 	}
 
 	/***
-	 * Unbinds service if it's bound
+     * Unbinds service if it's bound
 	 */
 	private void doUnbindService() {
 		if (mIsServiceBound) {
@@ -320,21 +351,25 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 	 * Starts service if it's not running already
 	 */
 	private void doStartService() {
-		if (!com.tartakynov.robotnoise.RobotService.isRunning()) {
+		if (!com.example.android.musicplayertapz.RobotService.isRunning()) {
 			Log.i(LOG_TAG, "startService");
-			startService(new Intent(MainActivity.this, com.tartakynov.robotnoise.RobotService.class));
+			startService(new Intent(MainActivity.this, com.example.android.musicplayertapz.RobotService.class));
 		}
 	}
 
 	/***
 	 * Stops service if it's running
-	 */
-	private void doStopService() {
-		if (com.tartakynov.robotnoise.RobotService.isRunning())
+     */
+    private void doStopService() {
+        if (com.example.android.musicplayertapz.RobotService.isRunning())
 		{
 			Log.i(LOG_TAG, "stopService");
-			stopService(new Intent(this, com.tartakynov.robotnoise.RobotService.class));
+			stopService(new Intent(this, com.example.android.musicplayertapz.RobotService.class));
 		}
 	}
+
+    private static final float map(float maxFrom, float maxTo, float value) {
+        return value * (maxTo / maxFrom);
+    }
 
 }

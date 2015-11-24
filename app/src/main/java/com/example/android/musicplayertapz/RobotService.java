@@ -1,18 +1,15 @@
 package com.example.android.musicplayertapz;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 
-import com.example.android.musicplayertapz.MainActivity;
-import com.example.android.musicplayertapz.R;
 import com.example.android.musicplayertapz.PocketDetector.IInPocketListener;
 import com.example.android.musicplayertapz.leg.LegMovementDetector;
 import com.example.android.musicplayertapz.leg.LegMovementDetector.ILegMovementListener;
@@ -33,9 +30,11 @@ public class RobotService extends Service {
     private PowerManager mPowerManager;
     private PowerManager.WakeLock mWakeLock;
     private LegMovementDetector mLegMovementDetector;    
-    private com.example.android.LegMovementPlayer mPlayer;
-    private com.example.android.PocketDetector mPocket;
+    private com.example.android.musicplayertapz.LegMovementPlayer mPlayer;
+    private com.example.android.musicplayertapz.PocketDetector mPocket;
     private boolean mIsStarted = false;
+    private MediaPlayer player;
+    Thread thread = new Thread(new Counter());
 
     public class RobotBinder extends Binder {
 	RobotService getService() {
@@ -52,10 +51,18 @@ public class RobotService extends Service {
 	    if (!mIsStarted) return;
 	    switch (activity) {
 	    case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
-		mPlayer.playBackward();
+		//mPlayer.playBackward();
+            //thread.stop();
+            //thread.start();
+			//player.start();
+            player.pause();
 		break;
 	    case LegMovementDetector.LEG_MOVEMENT_FORWARD:
-		mPlayer.playForward();
+		//mPlayer.playForward();
+            //thread.stop();
+            //thread.start();
+            //player.start();
+            player.pause();
 		break;
 	    }									
 	}   	
@@ -91,7 +98,6 @@ public class RobotService extends Service {
 	mPocket.registerListener(mPocketDetectorListener);
 	mPocket.start();	
 
-	showNotification(NOTIFICATION);
     }
 
     @Override
@@ -126,11 +132,7 @@ public class RobotService extends Service {
 	return mIsStarted;
     }
 
-    public void setVolume(float volume) {
-	if (mPlayer != null) {
-	    mPlayer.setVolume(volume);
-	}	
-    }
+
 
     public static boolean isRunning() {
 	return sIsRunning;
@@ -164,15 +166,5 @@ public class RobotService extends Service {
     /**
      * Show a notification while this service is running.
      */
-    @SuppressWarnings("deprecation")
-    private void showNotification(int id) {
-	CharSequence text = getText(R.string.robot_service_text);
-	Notification notification = new Notification(R.drawable.ic_launcher, text, System.currentTimeMillis());
-	notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-	Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-	notification.setLatestEventInfo(this, getText(R.string.robot_service_label), text, contentIntent);
-	mNotificationManager.notify(id, notification);
-    }
+
 }

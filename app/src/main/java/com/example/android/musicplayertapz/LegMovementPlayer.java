@@ -3,7 +3,6 @@ package com.example.android.musicplayertapz;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
-import android.media.MediaPlayer;
 
 /**
  * @author Artem Tartakynov
@@ -15,7 +14,6 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
 
     private final AudioManager mAudioManager;	
     private final Context mContext;
-    private MediaPlayer[] mPlayers = new MediaPlayer[2];
     private Object mSync = new Object();
     private boolean mCanPlay = false;
     private float mVolume;
@@ -47,31 +45,15 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
 	play(PLAYER_BACKWARD);		
     }
 
-    /**
-     * Sets volume
-     */
-    public void setVolume(float volume) {	
-	mVolume = volume;	
-	for (MediaPlayer player : mPlayers) {
-	    if (player != null) {
-		player.setVolume(volume, volume);
-	    }
-	}
-    }
 
     /**
      * Call this method when you are done with this instance
      */ 
     public void release() {
 	synchronized (mSync) {
-	    for (int i = 0; i < mPlayers.length; i++) {
 		if (mCanPlay) {
-		    if (mPlayers[i].isPlaying()) mPlayers[i].stop();
-		    mPlayers[i].release();
-		    mPlayers[i] = null;					
-		    mCanPlay = false;				
+			mCanPlay = false;
 		}
-	    }			
 	}
     }
 
@@ -80,10 +62,6 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
      */ 
     public void init() {
 	synchronized (mSync) {
-	    mPlayers[PLAYER_FORWARD] = MediaPlayer.create(mContext, R.raw.forward);
-	    mPlayers[PLAYER_BACKWARD] = MediaPlayer.create(mContext, R.raw.backward);
-	    mPlayers[PLAYER_FORWARD].setVolume(mVolume, mVolume);
-	    mPlayers[PLAYER_BACKWARD].setVolume(mVolume, mVolume);
 	    mCanPlay = true;							
 	}
     }
@@ -118,7 +96,7 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
      */
     private void play(int player) {
 	if (mCanPlay) {
-	    mPlayers[player].start();			
+	    //mPlayers[player].start();
 	}
     }
 }

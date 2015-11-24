@@ -1,12 +1,12 @@
-package com.tartakynov.robotnoise.leg;
-
-import java.util.ArrayList;
+package com.example.android.musicplayertapz.leg;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 /**
  * @author Artem Tartakynov
@@ -40,14 +40,14 @@ public class LegMovementDetector implements SensorEventListener {
     private int mLastActivity = LEG_MOVEMENT_NONE;
     private int mInactivityCount = 0;
 
-    private ScalarKalmanFilter mFiltersCascade[] = new ScalarKalmanFilter[3];
+    private com.example.android.musicplayertapz.leg.ScalarKalmanFilter mFiltersCascade[] = new com.example.android.musicplayertapz.leg.ScalarKalmanFilter[3];
 
     public LegMovementDetector(SensorManager sensorManager){
 	mSensorManager = sensorManager;
 	mAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-	mFiltersCascade[0] = new ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
-	mFiltersCascade[1] = new ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
-	mFiltersCascade[2] = new ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
+	mFiltersCascade[0] = new com.example.android.musicplayertapz.leg.ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
+	mFiltersCascade[1] = new com.example.android.musicplayertapz.leg.ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
+	mFiltersCascade[2] = new com.example.android.musicplayertapz.leg.ScalarKalmanFilter(1, 1, 0.01f, 0.0025f);
     }
 
     /********************* Public methods ******************************/
