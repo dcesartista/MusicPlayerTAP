@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -291,6 +292,49 @@ public class MainActivity extends Activity implements MediaPlayerControl {
 		stopService(playIntent);
 		musicSrv=null;
 		super.onDestroy();
+	}
+
+	/***
+	 * Binds service if it's not bound already
+	 */
+	private void doBindService() {
+		if (!mIsServiceBound) {
+			Log.i(LOG_TAG, "doBindService");
+			bindService(new Intent(MainActivity.this, com.tartakynov.robotnoise.RobotService.class), mConnection, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
+			mIsServiceBound = true;
+		}
+	}
+
+	/***
+	 * Unbinds service if it's bound
+	 */
+	private void doUnbindService() {
+		if (mIsServiceBound) {
+			Log.i(LOG_TAG, "doUnbindService");
+			unbindService(mConnection);
+			mIsServiceBound = false;
+		}
+	}
+
+	/***
+	 * Starts service if it's not running already
+	 */
+	private void doStartService() {
+		if (!com.tartakynov.robotnoise.RobotService.isRunning()) {
+			Log.i(LOG_TAG, "startService");
+			startService(new Intent(MainActivity.this, com.tartakynov.robotnoise.RobotService.class));
+		}
+	}
+
+	/***
+	 * Stops service if it's running
+	 */
+	private void doStopService() {
+		if (com.tartakynov.robotnoise.RobotService.isRunning())
+		{
+			Log.i(LOG_TAG, "stopService");
+			stopService(new Intent(this, com.tartakynov.robotnoise.RobotService.class));
+		}
 	}
 
 }

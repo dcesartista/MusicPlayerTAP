@@ -14,4 +14,14 @@
 		app:showAsAction="always"
 		android:title="End"/>
 
+	<item android:id="@+id/menu_about"
+		android:title="@string/menu_about"
+		android:orderInCategory="100"
+		app:showAsAction="never" />
+	<item android:id="@+id/menu_quit"
+		android:title="@string/menu_quit"
+		android:orderInCategory="101"
+		app:showAsAction="never"
+		android:icon="@android:drawable/ic_menu_close_clear_cancel"/>
+
 </menu>
